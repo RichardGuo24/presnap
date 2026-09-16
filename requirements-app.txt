@@ -1,0 +1,4 @@
+# Frontend (Phase 6) — separate from requirements.txt so the pipeline image and
+# CI don't pull Streamlit. Install with:  pip install -r requirements-app.txt
+-r requirements.txt
+streamlit==1.64.0
