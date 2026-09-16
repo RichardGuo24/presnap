@@ -1,0 +1,37 @@
+# Dev Postgres for PreSnap. Phase 5 will add the app service alongside this.
+# Start with:  docker compose up -d
+# Stop with:   docker compose down     (add -v to also wipe the data volume)
+services:
+  db:
+    image: postgres:16
+    container_name: presnap-db
+    environment:
+      POSTGRES_USER: presnap
+      POSTGRES_PASSWORD: presnap
+      POSTGRES_DB: presnap
+    ports:
+      - "5432:5432"            # exposed to the host so db.py connects at localhost:5432
+    volumes:
+      - presnap-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U presnap -d presnap"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # One-shot end-to-end smoke: waits for the DB, then runs the full pipeline.
+  #   docker compose up --build app
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # host is the compose service name `db`, not localhost — exercises the
+      # PRESNAP_DB_URL seam in db.py.
+      PRESNAP_DB_URL: postgresql://presnap:presnap@db:5432/presnap
+      SMOKE_SEASONS: "2020:2023"
+    command: ["bash", "scripts/smoke.sh"]
+
+volumes:
+  presnap-pgdata:

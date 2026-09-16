@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    # Real Postgres so DB-gated tests actually RUN — a skipped test must never
+    # be able to pass silently for lack of a database.
+    services:
+      db:
+        image: postgres:16
+        env:
+          POSTGRES_USER: presnap
+          POSTGRES_PASSWORD: presnap
+          POSTGRES_DB: presnap
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U presnap -d presnap"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      PRESNAP_DB_URL: postgresql://presnap:presnap@localhost:5432/presnap
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: End-to-end smoke (few seasons, real DB)
+        run: bash scripts/smoke.sh
+        env:
+          SMOKE_SEASONS: "2020:2023"
+
+      - name: Full test suite (DB live → nothing skips)
+        run: python -m pytest tests/ -q
+
+      - name: Guard — the no-lookahead test really runs (core guarantee)
+        # Fails the build if this test errors OR collects nothing (pytest exit 5).
+        run: python -m pytest tests/test_no_lookahead.py -q
