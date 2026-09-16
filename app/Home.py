@@ -6,9 +6,17 @@ Reads a committed win-probability snapshot (app/snapshot/wp_plays.parquet), so i
 needs no database or model to run. Set PRESNAP_APP_SOURCE=db to recompute live.
 """
 
-import streamlit as st
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # repo root -> import presnap
+
+import streamlit as st  # noqa: E402
+
+from presnap import webui  # noqa: E402
 
 st.set_page_config(page_title="PreSnap", page_icon="🏈", layout="wide")
+webui.inject()
 
 st.title("🏈 PreSnap")
 st.subheader("What were the odds — before every snap?")

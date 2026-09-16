@@ -8,8 +8,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))  # repo root -> imp
 import polars as pl  # noqa: E402
 import streamlit as st  # noqa: E402
 
-from presnap import appdata  # noqa: E402
+from presnap import appdata, webui  # noqa: E402
 
+webui.inject()
 st.title("Wildest games of the season")
 st.caption("Ranked by total win-probability swing — the sum of every up-and-down "
            "move in the home team's win probability. Big swing = a chaotic, "

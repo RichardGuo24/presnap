@@ -10,12 +10,13 @@ import pandas as pd  # noqa: E402
 import polars as pl  # noqa: E402
 import streamlit as st  # noqa: E402
 
-from presnap import appdata  # noqa: E402
+from presnap import appdata, webui  # noqa: E402
 
-MODEL_BLUE = "#0072B2"
-MARKET_AMBER = "#E69F00"
-GRID_GRAY = "#8A8A8A"
+MODEL_GREEN = "#1A7A4C"
+MARKET_AMBER = "#E0902A"
+GRID_GRAY = "#9AA0A6"
 
+webui.inject()
 st.title("Game win-probability curve")
 
 
@@ -61,7 +62,7 @@ frame = g.select("elapsed_min", "home_wp", "qtr", "posteam",
 
 model = (
     alt.Chart(frame)
-    .mark_line(color=MODEL_BLUE, interpolate="step-after")
+    .mark_line(color=MODEL_GREEN, interpolate="step-after")
     .encode(
         x=alt.X("elapsed_min:Q", title="Game minutes elapsed", scale=alt.Scale(domain=[0, 60])),
         y=alt.Y("home_wp:Q", title=f"{home} win probability", scale=alt.Scale(domain=[0, 1]),
@@ -83,7 +84,7 @@ vegas = alt.Chart(pd.DataFrame({"y": [market]})).mark_rule(
 
 st.altair_chart(even + vegas + model, use_container_width=True)
 st.markdown(
-    f"<span style='color:{MODEL_BLUE}'>●</span> Model (live)  &nbsp;&nbsp; "
+    f"<span style='color:{MODEL_GREEN}'>●</span> Model (live)  &nbsp;&nbsp; "
     f"<span style='color:{MARKET_AMBER}'>▬</span> Vegas pregame  &nbsp;&nbsp; "
     f"<span style='color:{GRID_GRAY}'>┈</span> 50/50",
     unsafe_allow_html=True,
