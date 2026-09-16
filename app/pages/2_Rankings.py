@@ -1,9 +1,14 @@
 """A season's wildest games, ranked by total win-probability swing."""
 
-import polars as pl
-import streamlit as st
+import sys
+from pathlib import Path
 
-from presnap import appdata
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))  # repo root -> import presnap
+
+import polars as pl  # noqa: E402
+import streamlit as st  # noqa: E402
+
+from presnap import appdata  # noqa: E402
 
 st.title("Wildest games — by win-probability swing")
 st.caption(

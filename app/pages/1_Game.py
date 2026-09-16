@@ -1,10 +1,15 @@
 """Pick a game, watch the home team's win-probability curve."""
 
-import altair as alt
-import polars as pl
-import streamlit as st
+import sys
+from pathlib import Path
 
-from presnap import appdata
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))  # repo root -> import presnap
+
+import altair as alt  # noqa: E402
+import polars as pl  # noqa: E402
+import streamlit as st  # noqa: E402
+
+from presnap import appdata  # noqa: E402
 
 st.title("Game win-probability curve")
 

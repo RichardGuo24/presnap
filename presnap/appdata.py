@@ -17,7 +17,9 @@ from pathlib import Path
 
 import polars as pl
 
-SNAPSHOT_PATH = Path("app/snapshot/wp_plays.parquet")
+# Anchored to the repo root (this file is presnap/appdata.py) so it resolves
+# regardless of the process working directory.
+SNAPSHOT_PATH = Path(__file__).resolve().parent.parent / "app" / "snapshot" / "wp_plays.parquet"
 
 
 def _from_db() -> pl.DataFrame:
