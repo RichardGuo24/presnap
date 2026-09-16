@@ -25,7 +25,7 @@ h1 { letter-spacing: -.03em; }
 a { color: var(--brand); }
 
 /* editorial column + spacing */
-.block-container { max-width: 880px; padding-top: 2rem; padding-bottom: 4rem; }
+.block-container { max-width: 880px; padding-top: 4.5rem; padding-bottom: 4rem; }
 
 /* brand rule */
 .presnap-brand { display: flex; align-items: baseline; gap: 10px;

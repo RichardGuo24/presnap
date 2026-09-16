@@ -14,4 +14,6 @@ st.set_page_config(page_title="PreSnap · Explained", page_icon="🏈", layout="
 webui.inject()
 
 html = (Path(__file__).resolve().parents[1] / "how_it_works.html").read_text()
-components.html(html, height=2000, scrolling=True)
+# scrolling=False so the iframe doesn't trap the wheel; height matched to the
+# content so nothing is cut off and the outer page scrolls through it.
+components.html(html, height=1900, scrolling=False)
