@@ -24,6 +24,9 @@ SNAPSHOT_PATH = Path(__file__).resolve().parent.parent / "app" / "snapshot" / "w
 
 def _from_db() -> pl.DataFrame:
     # Imported lazily so the deployed (parquet) app needs no db/model/sklearn.
+    import numpy as np
+    from scipy.stats import norm
+
     from presnap import db, inference
     from presnap.schema import PRESNAP_VIEW, RAW_TABLE, q
 
@@ -31,16 +34,22 @@ def _from_db() -> pl.DataFrame:
         f"SELECT * FROM {q(PRESNAP_VIEW)} WHERE down IS NOT NULL ORDER BY game_id, play_id"
     )
     home_wp = inference.home_wp(df)
+    # Pregame market win probability for the home team, from the closing spread.
+    # Home expected margin = spread_line; NFL final-margin std is ~13.86 points.
+    market_wp = norm.cdf(df["spread_line"].to_numpy() / 13.86)
     result = db.read_sql(f"SELECT DISTINCT game_id, result FROM {q(RAW_TABLE)}")
     return (
         df.select(
             "game_id", "play_id", "home_team", "away_team", "posteam",
-            "qtr", "down", "ydstogo",
+            "week", "qtr", "down", "ydstogo",
             pl.col("game_id").str.slice(0, 4).cast(pl.Int32).alias("season"),
             pl.col("score_differential").alias("score_diff"),
             ((3600 - pl.col("game_seconds_remaining")) / 60.0).alias("elapsed_min"),
         )
-        .with_columns(pl.Series("home_wp", home_wp))
+        .with_columns(
+            pl.Series("home_wp", home_wp),
+            pl.Series("market_wp", market_wp),
+        )
         .join(result, on="game_id", how="left")
     )
 

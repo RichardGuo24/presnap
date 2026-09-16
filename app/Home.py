@@ -2,9 +2,8 @@
 
     streamlit run app/Home.py
 
-Needs the Postgres DB running (docker compose up -d db) and a trained model
-(artifacts/gbm.joblib). Every number is served through presnap.inference, which
-reuses the training feature code — so the app can't drift from the model.
+Reads a committed win-probability snapshot (app/snapshot/wp_plays.parquet), so it
+needs no database or model to run. Set PRESNAP_APP_SOURCE=db to recompute live.
 """
 
 import streamlit as st
@@ -12,22 +11,27 @@ import streamlit as st
 st.set_page_config(page_title="PreSnap", page_icon="🏈", layout="wide")
 
 st.title("🏈 PreSnap")
-st.subheader("NFL win probability from pre-snap game state")
+st.subheader("What were the odds — before every snap?")
 
 st.markdown(
     """
-Every number here is computed from what's known **before the snap** — score,
-time, down, field position, the betting line — and never from what the play did.
-A gradient-boosted model, trained on 2010–2022 and graded on the untouched
-2023–24 seasons.
+For any moment in an NFL game, PreSnap estimates **each team's chance of winning**
+using only what's known *before the ball is snapped* — the score, time left, down,
+field position, and the betting line. Never what the play actually did.
 
-**Use the sidebar →**
-- **Game** — pick any game and watch its win-probability curve swing.
-- **Rankings** — a season's wildest games, ranked by total probability swing.
+**Pick a tab on the left:**
+- **Game** — watch a game's win-probability curve rise and crash, play by play.
+- **Rankings** — a season's wildest, most back-and-forth games.
+- **Explained** — a 2-minute, plain-English tour of every term and the math behind it.
 """
 )
 
 c1, c2, c3 = st.columns(3)
 c1.metric("Seasons", "2010–2024")
 c2.metric("Plays modeled", "605,941")
-c3.metric("Test Brier", "0.151", help="Coin-flip baseline is 0.25. Lower is better.")
+c3.metric("Accuracy (Brier)", "0.151",
+          help="Average squared error of the predicted probabilities. 0 is perfect, "
+               "0.25 is a coin flip. Measured on 2023–24 games the model never trained on.")
+
+st.caption("New here? The **Explained** tab defines win probability, Brier score, "
+           "calibration, and “WP swing” with simple visuals.")
