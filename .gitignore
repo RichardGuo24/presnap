@@ -6,3 +6,6 @@ data/
 *.parquet
 artifacts/
 reports/
+
+# The deployed app's committed win-probability snapshot (Option A).
+!app/snapshot/wp_plays.parquet
