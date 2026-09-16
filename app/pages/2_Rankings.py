@@ -16,12 +16,16 @@ st.caption("Ranked by total win-probability swing — the sum of every up-and-do
            "back-and-forth game; small swing = a wire-to-wire result.")
 
 
+_SNAP = Path(__file__).resolve().parents[1] / "snapshot" / "wp_plays.parquet"
+
+
 @st.cache_data
 def plays(sig):
     return appdata.load_plays()
 
 
-df = plays(appdata.snapshot_sig())
+_s = _SNAP.stat()
+df = plays((_s.st_size, int(_s.st_mtime)))
 seasons = sorted(df["season"].unique().to_list(), reverse=True)
 season = st.selectbox("Season", seasons)
 

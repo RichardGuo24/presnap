@@ -19,12 +19,18 @@ GRID_GRAY = "#8A8A8A"
 st.title("Game win-probability curve")
 
 
+# Cache-bust key computed here (page scripts always reload; imported modules may
+# not on Streamlit Cloud hot reloads), so a changed snapshot forces a reload.
+_SNAP = Path(__file__).resolve().parents[1] / "snapshot" / "wp_plays.parquet"
+
+
 @st.cache_data
 def plays(sig):
     return appdata.load_plays()
 
 
-df = plays(appdata.snapshot_sig())
+_s = _SNAP.stat()
+df = plays((_s.st_size, int(_s.st_mtime)))
 seasons = sorted(df["season"].unique().to_list(), reverse=True)
 season = st.selectbox("Season", seasons)
 
