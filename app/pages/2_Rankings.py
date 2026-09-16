@@ -17,11 +17,11 @@ st.caption("Ranked by total win-probability swing — the sum of every up-and-do
 
 
 @st.cache_data
-def plays():
+def plays(sig):
     return appdata.load_plays()
 
 
-df = plays()
+df = plays(appdata.snapshot_sig())
 seasons = sorted(df["season"].unique().to_list(), reverse=True)
 season = st.selectbox("Season", seasons)
 

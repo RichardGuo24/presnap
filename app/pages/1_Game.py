@@ -20,11 +20,11 @@ st.title("Game win-probability curve")
 
 
 @st.cache_data
-def plays():
+def plays(sig):
     return appdata.load_plays()
 
 
-df = plays()
+df = plays(appdata.snapshot_sig())
 seasons = sorted(df["season"].unique().to_list(), reverse=True)
 season = st.selectbox("Season", seasons)
 

@@ -54,6 +54,17 @@ def _from_db() -> pl.DataFrame:
     )
 
 
+def snapshot_sig() -> tuple[int, int]:
+    """A cheap fingerprint of the snapshot file (size, mtime).
+
+    Streamlit Cloud hot-reloads code without clearing @st.cache_data, so pages
+    pass this as the cache key — a changed parquet forces a reload instead of
+    serving a stale, wrong-schema DataFrame.
+    """
+    s = SNAPSHOT_PATH.stat()
+    return (s.st_size, int(s.st_mtime))
+
+
 def load_plays() -> pl.DataFrame:
     if os.environ.get("PRESNAP_APP_SOURCE", "parquet") == "db":
         return _from_db()
